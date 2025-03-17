@@ -1,30 +1,29 @@
 <?php
 /**
- * Plugin Name: Killbait URL Sender
- * Description: Envía automáticamente los posts publicados a https://killbait.com
+ * Plugin Name: KillBait URL Sender
+ * Description: Send new posts to https://killbait.com
  * Version: 1.0
  * Author: KillBait
  */
-
 if (!defined('ABSPATH')) {
-    exit; // Salir si se accede directamente
+    exit; 
 }
 
-// Agregar menú de configuración
-add_action('admin_menu', 'clickbait_validator_menu');
-function clickbait_validator_menu() {
-    add_options_page('Killbait URL Sender Settings', 'Killbait URL Sender', 'manage_options', 'clickbait-validator', 'clickbait_validator_settings_page');
+// Config menu
+add_action('admin_menu', 'killbait_menu');
+function killbait_menu() {
+    add_options_page('Killbait URL Sender Settings', 'Killbait URL Sender', 'manage_options', 'killbait', 'killbait_settings_page');
 }
 
-// Página de configuración
-function clickbait_validator_settings_page() {
+// Config page
+function killbait_settings_page() {
     ?>
     <div class="wrap">
-        <h1>Configuración de Killbait URL Sender</h1>
+        <h1>KillBait URL Sender configuration</h1>
         <form method="post" action="options.php">
             <?php
-            settings_fields('clickbait_validator_settings_group');
-            do_settings_sections('clickbait-validator');
+            settings_fields('killbait_settings_group');
+            do_settings_sections('killbait');
             submit_button();
             ?>
         </form>
@@ -32,83 +31,113 @@ function clickbait_validator_settings_page() {
     <?php
 }
 
-// Registrar opciones
-add_action('admin_init', 'clickbait_validator_settings_init');
-function clickbait_validator_settings_init() {
-    register_setting('clickbait_validator_settings_group', 'clickbait_validator_apikey');
-    register_setting('clickbait_validator_settings_group', 'clickbait_validator_language');
+// Register options
+add_action('admin_init', 'killbait_settings_init');
+function killbait_settings_init() {
+    register_setting('killbait_settings_group', 'killbait_apikey');
+    register_setting('killbait_settings_group', 'killbait_language');
+    register_setting('killbait_settings_group', 'killbait_categories'); // Opción para categorías
 
-    add_settings_section('clickbait_validator_section', 'Configuración General', null, 'clickbait-validator');
+    add_settings_section('killbait_section', 'General configuration', null, 'killbait');
 
-    add_settings_field('clickbait_validator_apikey', 'API Key', 'clickbait_validator_apikey_callback', 'clickbait-validator', 'clickbait_validator_section');
-    add_settings_field('clickbait_validator_language', 'Idioma', 'clickbait_validator_language_callback', 'clickbait-validator', 'clickbait_validator_section');
+    add_settings_field('killbait_apikey', 'API Key', 'killbait_apikey_callback', 'killbait', 'killbait_section');
+    add_settings_field('killbait_language', 'Language', 'killbait_language_callback', 'killbait', 'killbait_section');
+    add_settings_field('killbait_categories', 'Categories', 'killbait_categories_callback', 'killbait', 'killbait_section');
 }
 
-// Callback para API Key
-function clickbait_validator_apikey_callback() {
-    $apikey = get_option('clickbait_validator_apikey', '');
-    echo "<input type='text' name='clickbait_validator_apikey' value='$apikey' class='regular-text'>";
+// Callback for api key
+function killbait_apikey_callback() {
+    $apikey = get_option('killbait_apikey', '');
+    echo "<input type='text' name='killbait_apikey' value='$apikey' class='regular-text'><p><a href='https://killbait.com/api/doc' target='_blank'>Get your API Key</a></p>";
 }
 
-// Callback para selección de idioma
-function clickbait_validator_language_callback() {
-    $language = get_option('clickbait_validator_language', 'es');
-    echo "<select name='clickbait_validator_language'>
-            <option value='es' " . selected($language, 'es', false) . ">Español</option>
-            <option value='en' " . selected($language, 'en', false) . ">Inglés</option>
+// Callback for language
+function killbait_language_callback() {
+    $language = get_option('killbait_language', 'es');
+    echo "<select name='killbait_language'>
+            <option value='en' " . selected($language, 'en', false) . ">English</option>
+            <option value='es' " . selected($language, 'es', false) . ">Spanish</option>
           </select>";
 }
 
-// Modificar la función de validación para usar las opciones guardadas
-add_action('save_post', 'validate_post_url_on_publish', 10, 2);
-function validate_post_url_on_publish($ID, $post) {
-	
-	error_log('Se está ejecutando validate_post_url_on_publish');
-	error_log('API Key: ' . $apikey);
-	error_log('Post URL: ' . $post_url);
-	
-    $api_url = 'https://server1.killbait.com/api/validateURL';
-    $apikey = get_option('clickbait_validator_apikey', '');
-    $language = get_option('clickbait_validator_language', 'es');
-    
-    if (empty($apikey)) {
-        error_log('Error: API Key no configurada en Killbait URL Sender.');
-        return;
-    }
-    
-    $post_url = get_permalink($ID);
-    $args = array(
-        'body' => json_encode(array(
-            'url' => $post_url,
-            'language' => $language,
-            'apikey' => $apikey,
-        )),
-        'headers' => array(
-            'Content-Type' => 'application/json'
-        ),
-        'timeout' => 10
-    );
+// Callback for categories
+function killbait_categories_callback() {
+    $selected_categories = get_option('killbait_categories', array()); // Recuperar categorías seleccionadas
+    $categories = get_categories(array('hide_empty' => false)); // Obtener todas las categorías
 
-    $response = wp_remote_post($api_url, $args);
-	
-	if (is_wp_error($response)) {
-    error_log('Error en la solicitud API: ' . $response->get_error_message());
-} else {
-    error_log('Respuesta API: ' . wp_remote_retrieve_body($response));
+    echo '<select name="killbait_categories[]" multiple="multiple" class="regular-text" style="height: 150px;">';
+    foreach ($categories as $category) {
+        $selected = in_array($category->term_id, $selected_categories) ? 'selected' : '';
+        echo "<option value='{$category->term_id}' {$selected}>{$category->name}</option>";
+    }
+    echo '</select><p><em>If no category is selected, the plugin will apply to all published posts.</em></p>';
 }
 
-    if (is_wp_error($response)) {
-        error_log('Error en la validación de Clickbait: ' . $response->get_error_message());
+
+// Send post url to KillBait on publish
+add_action('transition_post_status', 'validate_post_url_on_publish', 10, 3);
+function validate_post_url_on_publish($new_status, $old_status, $post) {
+    if (!isset($new_status) || !isset($old_status) || !$post || !isset($post->ID)) {
+        error_log('KILLBAIT Error: No valid parameters at validate_post_url_on_publish.');
         return;
     }
 
-    $body = wp_remote_retrieve_body($response);
-    if (preg_match('/^[a-f0-9\-]{36}$/i', $body)) {
-        update_post_meta($ID, '_clickbait_validation_id', $body);
-    } else {
-        $data = json_decode($body, true);
-        if (isset($data['status'])) {
-            update_post_meta($ID, '_clickbait_validation_result', $data);
+    if ($old_status !== 'publish' && $new_status === 'publish') 
+	{
+        $apikey = get_option('killbait_apikey');
+
+		if (function_exists('pll_get_post_language')) 
+			$language = pll_get_post_language($post->ID, 'slug'); // 'es', 'en', etc.
+		else 
+			$language = get_option('killbait_language', 'en'); // Fallback if Polylang is not active
+
+		if (!in_array($language, ['es', 'en'])) {
+			$language = 'en';
+		}
+	
+        $post_url = get_permalink($post->ID);
+
+        $selected_categories = get_option('killbait_categories', array()); // Recuperar categorías seleccionadas
+
+        if (empty($apikey) || empty($language) || empty($post_url) || empty($selected_categories)) {
+            error_log('KILLBAIT Error: Missing ApiKey, language, categories or Post URL.');
+            return;
         }
+
+        $post_categories = wp_get_post_categories($post->ID);
+
+        $intersection = array_intersect($post_categories, $selected_categories);
+        if (!empty($selected_categories) && empty($intersection)) {
+            error_log('KILLBAIT Error: Post does not belong to any selected category.');
+            return;
+        }
+
+        $body = http_build_query(array(
+            'apikey'   => $apikey,
+            'url'      => $post_url,
+            'language' => $language
+        ));
+
+        $response = wp_remote_post('https://server1.killbait.com/api/public/queueURL', array(
+            'body'    => $body,
+            'headers' => array(
+                'Content-Type' => 'application/x-www-form-urlencoded'
+            ),
+            'timeout' => 10
+        ));
+
+        if (is_wp_error($response)) {
+            error_log('KILLBAIT API Error: ' . $response->get_error_message());
+            return;
+        }
+
+        $response_code = wp_remote_retrieve_response_code($response);
+        $response_body = wp_remote_retrieve_body($response);
+
+        error_log('KILLBAIT API response code: ' . $response_code . '.');
+        error_log('KILLBAIT API response body: ' . $response_body . '.');
+        
     }
 }
+
+
