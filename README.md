@@ -1,4 +1,4 @@
-#  Killbait URL Sender
+#  KillBait URL Sender
 
 A WordPress plugin to send your posts to the KillBait news aggregator
 
