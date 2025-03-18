@@ -1,10 +1,19 @@
 <?php
 /**
  * Plugin Name: KillBait URL Sender
- * Description: Send new posts to https://killbait.com
  * Version: 1.0
- * Author: KillBait
+ * Description: Easily send URLs to Killbait news aggregator for selected categories and languages. 
+ * Requires at least: 5.2
+ * Requires PHP: 7.2
+ * Plugin URI: https://github.com/killbaitnews/killbait_url_sender/
+ * Author: KilLBait
+ * Author URI: https://killbait.com
+ * Text Domain: killbait-url-sender
+ * License: GPLv2 or later
+ * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  */
+
+
 if (!defined('ABSPATH')) {
     exit; 
 }
@@ -12,7 +21,7 @@ if (!defined('ABSPATH')) {
 // Config menu
 add_action('admin_menu', 'killbait_menu');
 function killbait_menu() {
-    add_options_page('Killbait URL Sender Settings', 'Killbait URL Sender', 'manage_options', 'killbait', 'killbait_settings_page');
+    add_options_page('KillBait URL Sender Settings', 'KillBait URL Sender', 'manage_options', 'killbait', 'killbait_settings_page');
 }
 
 // Config page
@@ -34,9 +43,19 @@ function killbait_settings_page() {
 // Register options
 add_action('admin_init', 'killbait_settings_init');
 function killbait_settings_init() {
-    register_setting('killbait_settings_group', 'killbait_apikey');
-    register_setting('killbait_settings_group', 'killbait_language');
-    register_setting('killbait_settings_group', 'killbait_categories'); // Opción para categorías
+	
+register_setting('killbait_settings_group', 'killbait_apikey', [
+    'sanitize_callback' => 'sanitize_text_field'
+]);
+
+register_setting('killbait_settings_group', 'killbait_language', [
+    'sanitize_callback' => 'sanitize_text_field'
+]);
+
+register_setting('killbait_settings_group', 'killbait_categories', [
+    'sanitize_callback' => 'sanitize_text_field'
+]);
+
 
     add_settings_section('killbait_section', 'General configuration', null, 'killbait');
 
