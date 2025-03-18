@@ -1,4 +1,4 @@
-=== Killbait URL Sender ===
+=== KillBait URL Sender ===
 Contributors: KillBait  
 Tags: api, links, news, aggregator  
 Requires at least: 5.2
@@ -19,7 +19,7 @@ This plugin integrates seamlessly with WordPress to automate the process.
 1. Download and upload the plugin to /wp-content/plugins/.
 2. Activate it in the admin panel.
 3. Register at https://killbait.com/auth/login and get your API Key in your user profile.
-4. Configure the selected categories, language and API Key in Settings > Killbait URL Sender.
+4. Configure the selected categories, language and API Key in Settings > KillBait URL Sender.
 
 == Changelog ==  
 = 1.0 =  
@@ -27,8 +27,8 @@ This plugin integrates seamlessly with WordPress to automate the process.
 
 
 == Frequently Asked Questions ==
-1. What is Killbait URL Sender?
-Killbait URL Sender is a WordPress plugin that allows you to send website URLs to Killbait for analysis, helping detect and prevent malicious activity.
+1. What is KillBait URL Sender?
+KillBait URL Sender is a WordPress plugin that allows you to send website URLs to Killbait for analysis, helping detect and prevent malicious activity.
 
 2. How do I get my API Key?
 You can obtain your API Key by registering at https://killbait.com/auth/login and accessing your user profile.
