@@ -3,7 +3,7 @@
 A WordPress plugin to send your posts to the KillBait news aggregator
 
 - Contributors: KillBait  
-- Tags: api, links, news, aggregator  
+- Tags: api, links, news, aggregator, linkbuilding  
 - Requires at least: 5.2
 - Tested up to: 6.7
 - Requires PHP: 7.2
@@ -43,7 +43,15 @@ Yes, Killbait offers free API access with certain limitations. Visit https://kil
 
 5. What if I use Polylang plugin?
 If you use the Polylang plugin, the post will be sent to the English or Spanish version of Killbait based on the language specified by Polylang. If the post is in any other language, it will be sent to the English version by defaul
- 
+
 
 # Screenshots
 1. Plugin Settings Page – https://cdn.killbait.com/static/killbait-url-sender.png
+
+# External services
+This plugin connects to the KillBait API to send the URLs of the posts from your site that you want to be published on KillBait.  
+Each time a post is sent to KillBait, the URL of your post, the language code ("en" or "es") in which you want your post to be shared on KillBait, and your API key for authentication with the KillBait API are sent.  
+For more detailed information, refer to the [KillBait API documentation](https://killbait.com/api/doc).  
+This service is offered under the following [terms of use](https://killbait.com/legal/legal-advise) and [privacy policy](https://killbait.com/legal/privacy-policy).
+
+
